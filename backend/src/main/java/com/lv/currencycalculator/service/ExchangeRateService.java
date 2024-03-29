@@ -25,12 +25,20 @@ public class ExchangeRateService {
         return exchangeRateRepository.findByCurrencyCodeAndDateBetween(currency, parseDate(dateFrom), parseDate(dateTo));
     }
 
+    public List<ExchangeRate> getActualRates() {
+        return exchangeRateRepository.findAllCurrenciesWithLatestDate();
+    }
+
     public BigDecimal calculateAmount(String amountStr, String dateStr, String currency) {
         BigDecimal amount = new BigDecimal(amountStr);
         LocalDate date = parseDate(dateStr);
         Optional<ExchangeRate> exchangeRateToExchange = exchangeRateRepository.findByDateAndCurrencyCode(date, currency);
         return exchangeRateToExchange.map(exchangeRate -> amount.multiply(exchangeRate.getRate()))
                 .orElseThrow(() -> new IllegalArgumentException("Exchange rate not found for the given date and currency"));
+    }
+
+    public List<Object> getCurrencyCodes() {
+        return exchangeRateRepository.getCurrencyCodes();
     }
 
     private LocalDate parseDate(String dateStr) {

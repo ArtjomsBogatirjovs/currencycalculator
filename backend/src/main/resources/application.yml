@@ -17,4 +17,4 @@ exchange:
     url: https://www.lb.lt/webservices/FxRates/FxRates.asmx/getCurrentFxRates?tp=EU
   rate:
     fetch:
-      cron: "0 4 18 * * ?"
+      cron: "0 00 22 * * ?"
