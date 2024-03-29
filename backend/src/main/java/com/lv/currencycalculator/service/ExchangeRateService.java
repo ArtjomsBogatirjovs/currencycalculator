@@ -17,8 +17,6 @@ import java.util.Optional;
 public class ExchangeRateService {
 
     private final ExchangeRateRepository exchangeRateRepository;
-    private static final String EUR_CURRENCY = "EUR";
-
 
     public List<ExchangeRate> getRateByNameAndPeriod(String currency, String dateFrom, String dateTo) {
         if (currency == null) {
