@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: currencycalculator
+  datasource:
+    url: jdbc:h2:mem:currencycalc
+    username: admin
+    password: admin
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+      path: /console
+exchange:
+  api:
+    url: https://www.lb.lt/webservices/FxRates/FxRates.asmx/getCurrentFxRates?tp=EU
+  rate:
+    fetch:
+      cron: "0 4 18 * * ?"
