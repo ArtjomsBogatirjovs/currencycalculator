@@ -1,11 +1,11 @@
 package com.lv.currencycalculator.controller;
 
 import com.lv.currencycalculator.db.entities.ExchangeRate;
+import com.lv.currencycalculator.dto.CalculatedValueDTO;
 import com.lv.currencycalculator.service.ExchangeRateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -22,7 +22,7 @@ public class ExchangeRateController {
     }
 
     @GetMapping("/calculate")
-    public BigDecimal calculateInForeignCurrency(@RequestParam String currencyCode, @RequestParam String date, @RequestParam String amount) {
+    public CalculatedValueDTO calculateInForeignCurrency(@RequestParam String currencyCode, @RequestParam String date, @RequestParam String amount) {
         return exchangeRateService.calculateAmount(amount, date, currencyCode);
     }
 

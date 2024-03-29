@@ -3,31 +3,46 @@ package com.lv.currencycalculator.service;
 import com.lv.currencycalculator.db.entities.ExchangeRate;
 import com.lv.currencycalculator.db.repository.ExchangeRateRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLConnection;
 import java.time.LocalDate;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ExchangeRateParserService {
     private final ExchangeRateRepository exchangeRateRepository;
 
-    private static final String EUR_CURRENCY = "EUR";
     private static final String AMOUNT_TAG = "Amt";
     private static final String CURRENCY_TAG = "Ccy";
     private static final String CURRENCY_RATE_TAG = "CcyAmt";
     private static final String DATE_TAG = "Dt";
     private static final String RATE_TAG = "FxRate";
 
-    private boolean eurRateCreated = false;
 
-    public void parseAndSaveExchangeRates(Document exchangeRateDoc) {
+    public void parseAndSaveExchangeRates(String exchangeRateUrl) throws URISyntaxException, IOException, ParserConfigurationException, SAXException {
+        URI tempUri = new URI(exchangeRateUrl);
+        URLConnection connection = tempUri.toURL().openConnection();
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document exchangeRateDoc = db.parse(connection.getInputStream());
+
         exchangeRateDoc.getDocumentElement().normalize();
         NodeList rates = exchangeRateDoc.getElementsByTagName(RATE_TAG);
         parseXmlToExchangeRates(rates).forEach(this::saveExchangeRate);
@@ -35,7 +50,11 @@ public class ExchangeRateParserService {
 
     private void saveExchangeRate(ExchangeRate rate) {
         if (Objects.nonNull(rate)) {
-            exchangeRateRepository.save(rate);
+            try {
+                exchangeRateRepository.save(rate);
+            } catch (Exception e) {
+                log.error("Error during saving " + rate + " " + e.getMessage());
+            }
         }
     }
 
@@ -56,10 +75,6 @@ public class ExchangeRateParserService {
                     String currency = ccyAmtElement.getElementsByTagName(CURRENCY_TAG).item(0).getTextContent();
                     String amount = ccyAmtElement.getElementsByTagName(AMOUNT_TAG).item(0).getTextContent();
 
-                    if (EUR_CURRENCY.equals(currency) && eurRateCreated) {
-                        continue;
-                    }
-
                     ExchangeRate tempExchangeRate = ExchangeRate.builder()
                             .currencyCode(currency)
                             .rate(new BigDecimal(amount))
@@ -67,10 +82,6 @@ public class ExchangeRateParserService {
                             .build();
 
                     resultList.add(tempExchangeRate);
-
-                    if ("EUR".equals(currency)) {
-                        eurRateCreated = true;
-                    }
                 }
             }
         }

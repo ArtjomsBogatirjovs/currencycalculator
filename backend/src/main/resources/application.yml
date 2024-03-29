@@ -14,7 +14,8 @@ spring:
       path: /console
 exchange:
   api:
-    url: https://www.lb.lt/webservices/FxRates/FxRates.asmx/getCurrentFxRates?tp=EU
+    urlCurrent: https://www.lb.lt/webservices/FxRates/FxRates.asmx/getCurrentFxRates?tp=EU
+    urlPeriod: https://www.lb.lt/webservices/FxRates/FxRates.asmx/getFxRatesForCurrency?tp=EU
   rate:
     fetch:
-      cron: "0 00 22 * * ?"
+      cron: "0 0 6 * * ?"

@@ -12,11 +12,13 @@ public interface ExchangeRateRepository extends JpaRepository<ExchangeRate, Long
     @Query("select e from ExchangeRate e where e.currencyCode = ?1 and e.date between ?2 and ?3")
     List<ExchangeRate> findByCurrencyCodeAndDateBetween(String currencyCode, LocalDate dateStart, LocalDate dateEnd);
 
-    Optional<ExchangeRate> findByDateAndCurrencyCode(LocalDate date, String currencyCode);
-
     @Query("SELECT er FROM ExchangeRate er WHERE er.date IN (SELECT MAX(er2.date) FROM ExchangeRate er2 WHERE er2.currencyCode = er.currencyCode GROUP BY er2.currencyCode)")
     List<ExchangeRate> findAllCurrenciesWithLatestDate();
 
     @Query("SELECT er.currencyCode FROM ExchangeRate er WHERE er.date IN (SELECT MAX(er2.date) FROM ExchangeRate er2 WHERE er2.currencyCode = er.currencyCode GROUP BY er2.currencyCode)")
     List<Object> getCurrencyCodes();
+
+    Optional<ExchangeRate> findFirstByCurrencyCodeAndDateLessThanEqualOrderByDateDesc(String currencyCode, LocalDate date);
+
+
 }

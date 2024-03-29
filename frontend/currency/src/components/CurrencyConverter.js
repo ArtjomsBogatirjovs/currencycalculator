@@ -5,7 +5,7 @@ function CurrencyConverter() {
     const [currencyCode, setCurrencyCode] = useState('');
     const [date, setDate] = useState('');
     const [amount, setAmount] = useState('');
-    const [result, setResult] = useState(null);
+    const [result, setResult] = useState({ convertedAmount: null, usedRate: null, currencyCode: '' });
     const [availableCurrencies, setAvailableCurrencies] = useState([]);
 
     useEffect(() => {
@@ -36,7 +36,13 @@ function CurrencyConverter() {
             <input type="date" value={date} onChange={e => setDate(e.target.value)} />
             <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Amount" />
             <button onClick={convertCurrency}>Convert</button>
-            {result && <p>Converted Amount: {result}</p>}
+            {result.convertedAmount && (
+                <div>
+                    <p>Converted Amount: {result.convertedAmount}</p>
+                    <p>Used Rate: {result.usedRate}</p>
+                    <p>Currency Code: {result.currencyCode}</p>
+                </div>
+            )}
         </div>
     );
 }
